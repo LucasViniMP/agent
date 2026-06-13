@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MesaMestre — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #F0F2F5;
+      --surface: #FFFFFF;
+      --surface2: #F7F8FA;
+      --border: #E3E5EA;
+      --text: #0D0D0D;
+      --text2: #52525E;
+      --text3: #9898A8;
+      --accent: #0D0D0D;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --sidebar: 236px;
+
+      --c-green: #1A7A4A;
+      --c-green-bg: #EDFAF3;
+      --c-red: #C02020;
+      --c-red-bg: #FFF0F0;
+      --c-red-border: #F5C4C4;
+      --c-blue: #1A5DB0;
+      --c-blue-bg: #EEF4FF;
+      --c-amber: #955500;
+      --c-amber-bg: #FFF8EC;
+      --c-purple: #5B3DBE;
+      --c-purple-bg: #F0EBFF;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @keyframes blink {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+
+    .sidebar {
+      width: var(--sidebar);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      overflow: hidden;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background: var(--text);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-mark svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .logo-wordmark {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .logo-wordmark small {
+      display: block;
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      color: var(--text3);
+      font-family: 'DM Sans', sans-serif;
+      margin-top: 2px;
+    }
+
+    .nav-section-label {
+      padding: 18px 20px 6px;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 14px;
+      margin: 1px 8px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 400;
+      color: var(--text2);
+      transition: background 0.12s, color 0.12s;
+      user-select: none;
+      border: none;
+      background: none;
+      width: calc(100% - 16px);
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .nav-item:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: var(--text);
+      color: white;
+      font-weight: 500;
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      opacity: 0.6;
+    }
+
+    .nav-item.active svg {
+      opacity: 1;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+      flex-shrink: 0;
+    }
+
+    .sidebar-user-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .sidebar-user-name {
+      font-size: 12.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-user-role {
+      font-size: 11px;
+      color: var(--text3);
+    }
+
+
+    .main {
+      margin-left: var(--sidebar);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-title {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .content {
+      padding: 28px;
+      flex: 1;
+    }
+
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 34px;
+      font-weight: 500;
+      line-height: 1;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-sub {
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .chip-green {
+      background: var(--c-green-bg);
+      color: var(--c-green);
+    }
+
+    .chip-amber {
+      background: var(--c-amber-bg);
+      color: var(--c-amber);
+    }
+
+    .chip-blue {
+      background: var(--c-blue-bg);
+      color: var(--c-blue);
+    }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+
+    .order-row {
+      display: flex;
+      align-items: center;
+      padding: 11px 20px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+      font-size: 13px;
+    }
+
+    .order-row:last-child {
+      border-bottom: none;
+    }
+
+    .order-num {
+      font-weight: 600;
+      font-size: 12px;
+      min-width: 38px;
+      color: var(--text2);
+    }
+
+    .order-info {
+      flex: 1;
+    }
+
+    .order-info small {
+      color: var(--text3);
+      font-size: 11px;
+      display: block;
+      margin-top: 1px;
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 500;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .dot-green {
+      background: var(--c-green);
+    }
+
+    .dot-amber {
+      background: #E09800;
+    }
+
+    .dot-blue {
+      background: var(--c-blue);
+    }
+
+    .activity-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 11px 20px;
+      border-bottom: 1px solid var(--border);
+      gap: 11px;
+      font-size: 13px;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .act-dot-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 6px;
+    }
+
+    .act-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .act-info {
+      flex: 1;
+    }
+
+    .act-msg {
+      line-height: 1.4;
+    }
+
+    .act-time {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 3px;
+    }
+
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .section-header h2 {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.12s, transform 0.1s, background 0.12s;
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.85;
+    }
+
+    .btn-ghost {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text2);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: var(--c-red-bg);
+      color: var(--c-red);
+      border: 1px solid var(--c-red-border);
+    }
+
+    .btn-danger:hover {
+      opacity: 0.8;
+    }
+
+    .btn-sm {
+      padding: 5px 11px;
+      font-size: 12px;
+    }
+
+
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: var(--surface2);
+    }
+
+    th {
+      padding: 11px 18px;
+      text-align: left;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 13px 18px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover td {
+      background: var(--surface2);
+    }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text2);
+      flex-shrink: 0;
+    }
+
+    .cell-name {
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    .cell-sub {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 1px;
+    }
+
+    .role-chip {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .role-admin {
+      background: var(--c-purple-bg);
+      color: var(--c-purple);
+    }
+
+    .role-cook {
+      background: var(--c-amber-bg);
+      color: var(--c-amber);
+    }
+
+    .role-balc {
+      background: var(--c-blue-bg);
+      color: var(--c-blue);
+    }
+
+    .role-waiter {
+      background: var(--c-green-bg);
+      color: var(--c-green);
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .status-active {
+      background: var(--c-green-bg);
+      color: var(--c-green);
+    }
+
+    .status-inactive {
+      background: var(--bg);
+      color: var(--text3);
+      border: 1px solid var(--border);
+    }
+
+    .action-group {
+      display: flex;
+      gap: 5px;
+      flex-wrap: nowrap;
+    }
+
+
+    .menu-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .search-box {
+      flex: 1;
+      max-width: 280px;
+      padding: 8px 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      outline: none;
+      color: var(--text);
+    }
+
+    .search-box:focus {
+      border-color: #888;
+    }
+
+    .filter-select {
+      padding: 8px 13px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      outline: none;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .dish-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.15s;
+    }
+
+    .dish-card:hover {
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.07);
+    }
+
+    .dish-thumb {
+      height: 110px;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text3);
+      border-bottom: 1px solid var(--border);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .dish-body {
+      padding: 13px 15px;
+      flex: 1;
+    }
+
+    .dish-name {
+      font-weight: 600;
+      font-size: 13.5px;
+      margin-bottom: 3px;
+    }
+
+    .dish-cat {
+      font-size: 11px;
+      color: var(--text3);
+      margin-bottom: 10px;
+    }
+
+    .avail-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.12s;
+    }
+
+    .avail-on {
+      background: var(--c-green-bg);
+      color: var(--c-green);
+    }
+
+    .avail-off {
+      background: var(--bg);
+      color: var(--text3);
+      border: 1px solid var(--border);
+    }
+
+    .dish-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .dish-price {
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: -0.01em;
+    }
+
+    .dish-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .icon-btn {
+      width: 27px;
+      height: 27px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.1s, border-color 0.1s;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg);
+    }
+
+    .icon-btn.del:hover {
+      background: var(--c-red-bg);
+      border-color: var(--c-red-border);
+    }
+
+    .icon-btn svg {
+      width: 13px;
+      height: 13px;
+      color: var(--text2);
+    }
+
+    .icon-btn.del:hover svg {
+      color: var(--c-red);
+    }
+
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 28px;
+      width: 420px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+      transform: translateY(10px) scale(0.99);
+      transition: transform 0.18s;
+    }
+
+    .modal-overlay.open .modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      margin-bottom: 22px;
+    }
+
+    .modal-title {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      margin-bottom: 4px;
+    }
+
+    .modal-sub {
+      font-size: 13px;
+      color: var(--text2);
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text2);
+      margin-bottom: 5px;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13.5px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: #888;
+      background: white;
+    }
+
+    .field input::placeholder {
+      color: var(--text3);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+
+    .confirm-modal {
+      width: 380px;
+    }
+
+    .confirm-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--c-red-bg);
+      border: 1px solid var(--c-red-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .confirm-icon svg {
+      width: 20px;
+      height: 20px;
+      color: var(--c-red);
+    }
+
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--text);
+      color: white;
+      padding: 11px 18px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+      transform: translateY(50px);
+      opacity: 0;
+      transition: transform 0.22s, opacity 0.22s;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text3);
+      font-size: 13px;
+    }
+
+    .empty-state strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path
+            d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z" />
+          <line x1="6" y1="17" x2="18" y2="17" />
+        </svg>
+      </div>
+      <div class="logo-wordmark">
+        MESAMESTRE
+        <small>Administração</small>
+      </div>
+    </div>
+
+    <div class="nav-section-label">Principal</div>
+
+    <button class="nav-item active" onclick="navigate('dashboard', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7" />
+        <rect x="14" y="3" width="7" height="7" />
+        <rect x="14" y="14" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" />
+      </svg>
+      Dashboard
+    </button>
+
+    <button class="nav-item" onclick="navigate('users', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+      Usuários
+    </button>
+
+    <button class="nav-item" onclick="navigate('menu', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M3 11l19-9-9 19-2-8-8-2z" />
+      </svg>
+      Cardápio
+    </button>
+
+    <button class="nav-item" onclick="navigate('reports', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+      </svg>
+      Relatórios & Rendimentos
+    </button>
+
+    <div class="nav-section-label">Sistema</div>
+
+    <button class="nav-item" onclick="navigate('settings', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      </svg>
+      Configurações
+    </button>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar" id="sidebar-initials">AD</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-name">Administrador</div>
+          <div class="sidebar-user-role">Admin</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard</div>
+    </div>
+
+    <div class="content">
+
+
+      <div class="section active" id="sec-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Pedidos Hoje</div>
+            <div class="stat-value" id="stat-orders">0</div>
+            <div class="stat-sub"><span class="chip chip-green">Atualizado agora</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Em Andamento</div>
+            <div class="stat-value" id="stat-active">0</div>
+            <div class="stat-sub"><span class="chip chip-amber">Aguardando / Preparo</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Funcionários Online</div>
+            <div class="stat-value" id="stat-staff">0</div>
+            <div class="stat-sub"><span class="chip chip-green" style="animation: blink 2s infinite;">Online
+                agora</span></div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Pedidos Recentes</div>
+            </div>
+            <div id="dash-orders"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Log de Atividades</div>
+            </div>
+            <div id="dash-activity"></div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="section" id="sec-users">
+        <div class="section-header">
+          <h2>Usuários</h2>
+          <button class="btn btn-primary" onclick="openModal('user')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Novo Funcionário
+          </button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Funcionário</th>
+                <th>Cargo</th>
+                <th>Status</th>
+                <th>Cadastrado em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <div class="section" id="sec-menu">
+        <div class="section-header">
+          <h2>Cardápio</h2>
+          <button class="btn btn-ghost" onclick="removeDuplicateDishes()">
+            Remover Duplicados
+          </button>
+          <button class="btn btn-primary" onclick="openModal('dish')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Adicionar Prato
+          </button>
+        </div>
+        <div class="menu-controls">
+          <input type="text" class="search-box" placeholder="Buscar prato..." id="menu-search" oninput="renderMenu()">
+          <select class="filter-select" id="menu-cat-filter" onchange="renderMenu()">
+            <option value="">Todas as categorias</option>
+            <option>Lanches</option>
+            <option>Porções</option>
+            <option>Entradas</option>
+            <option>Principais</option>
+            <option>Bebidas</option>
+            <option>Sobremesas</option>
+          </select>
+        </div>
+        <div class="menu-grid" id="menu-grid"></div>
+      </div>
+
+
+      <div class="section" id="sec-reports">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Rendimento Total</div>
+            <div class="stat-value" id="rep-stat-revenue">R$ 0,00</div>
+            <div class="stat-sub"><span class="chip chip-green">Ativos e concluídos</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pedidos Concluídos</div>
+            <div class="stat-value" id="rep-stat-orders">0</div>
+            <div class="stat-sub"><span class="chip chip-blue">Volume de vendas</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Ticket Médio</div>
+            <div class="stat-value" id="rep-stat-ticket">R$ 0,00</div>
+            <div class="stat-sub"><span class="chip chip-green">Média por cliente</span></div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Faturamento por Categoria</div>
+            </div>
+            <div
+              style="padding: 24px; display: flex; align-items: center; justify-content: center; min-height: 280px; position: relative;">
+              <canvas id="chart-categories" style="max-height: 240px; max-width: 100%;"></canvas>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Produtos Mais Pedidos</div>
+            </div>
+            <div id="rep-most-ordered" style="max-height: 328px; overflow-y: auto;">
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="section" id="sec-settings">
+        <div class="section-header">
+          <h2>Configurações</h2>
+        </div>
+
+        <div class="panel" style="max-width:520px;">
+          <div class="panel-header">
+            <div class="panel-title">Minha Conta</div>
+          </div>
+          <div style="padding:20px;">
+            <div class="field"><label>Nome de exibição</label><input type="text" id="cfg-name" placeholder="Seu nome">
+            </div>
+            <div class="field"><label>E-mail</label><input type="email" id="cfg-email"
+                placeholder="email@restaurante.com"></div>
+            <hr class="modal-divider">
+            <div class="field"><label>Nova Senha</label><input type="password" id="cfg-pass"
+                placeholder="Deixe em branco para não alterar"></div>
+            <div class="field"><label>Confirmar Nova Senha</label><input type="password" id="cfg-pass2"
+                placeholder="Repita a nova senha"></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+              <button class="btn btn-primary" onclick="saveSettings()">Salvar Alterações</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modal-user" onclick="overlayClose(event,'user')">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="user-modal-title">Novo Funcionário</div>
+        <div class="modal-sub" id="user-modal-sub">Preencha os dados para criar a conta</div>
+      </div>
+      <input type="hidden" id="u-id">
+      <div class="field-row">
+        <div class="field" style="grid-column:1/-1"><label>Nome Completo *</label><input type="text" id="u-name"
+            placeholder="Ex: João Silva"></div>
+      </div>
+      <div class="field"><label>E-mail *</label><input type="email" id="u-email" placeholder="email@restaurante.com">
+      </div>
+      <div class="field" id="u-pass-field">
+        <label>Senha *</label>
+        <input type="password" id="u-pass" placeholder="Mínimo 6 caracteres">
+      </div>
+      <div class="field">
+        <label>Cargo *</label>
+        <select id="u-role">
+          <option value="Administrador">Administrador</option>
+          <option value="Cozinheiro">Cozinheiro</option>
+          <option value="Balconista">Balconista</option>
+          <option value="Garcom">Garçom</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('user')">Cancelar</button>
+        <button class="btn btn-primary" id="u-submit-btn" onclick="submitUser()">Criar Conta</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modal-dish" onclick="overlayClose(event,'dish')">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="dish-modal-title">Adicionar Prato</div>
+        <div class="modal-sub">Preencha as informações do prato</div>
+      </div>
+      <input type="hidden" id="d-id">
+      <div class="field"><label>Nome do Prato *</label><input type="text" id="d-name"
+          placeholder="Ex: Risoto de Camarão"></div>
+      <div class="field-row">
+        <div class="field">
+          <label>Preço (R$) *</label>
+          <input type="number" id="d-price" placeholder="0.00" step="0.01" min="0">
+        </div>
+        <div class="field">
+          <label>Categoria *</label>
+          <select id="d-cat">
+            <option>Lanches</option>
+            <option>Porções</option>
+            <option>Entradas</option>
+            <option>Principais</option>
+            <option>Bebidas</option>
+            <option>Sobremesas</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('dish')">Cancelar</button>
+        <button class="btn btn-primary" id="d-submit-btn" onclick="submitDish()">Adicionar Prato</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modal-confirm" onclick="overlayClose(event,'confirm')">
+    <div class="modal confirm-modal">
+      <div class="confirm-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+          <path d="M10 11v6" />
+          <path d="M14 11v6" />
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+        </svg>
+      </div>
+      <div class="modal-title">Confirmar exclusão</div>
+      <div class="modal-sub" id="confirm-text" style="margin-top:6px;"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('confirm')">Cancelar</button>
+        <button class="btn btn-danger" onclick="executeDelete()">Excluir definitivamente</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal-overlay" id="modal-reset" onclick="overlayClose(event,'reset')">
+    <div class="modal confirm-modal">
+      <div class="modal-header">
+        <div class="modal-title">Resetar Senha</div>
+        <div class="modal-sub" id="reset-sub">Defina uma nova senha para o funcionário</div>
+      </div>
+      <input type="hidden" id="reset-uid">
+      <div class="field"><label>Nova Senha *</label><input type="password" id="reset-pass"
+          placeholder="Mínimo 6 caracteres"></div>
+      <div class="field"><label>Confirmar Nova Senha *</label><input type="password" id="reset-pass2"
+          placeholder="Repita a senha"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('reset')">Cancelar</button>
+        <button class="btn btn-primary" onclick="executeReset()">Salvar Nova Senha</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyAtYpRrToUxKNPYeGNJdic-2AZdOLIwreU',
+      appId: '1:515755675116:web:afc98f8d4a2e0ad13ec4c9',
+      messagingSenderId: '515755675116',
+      projectId: 'mesamestrre',
+      authDomain: 'mesamestrre.firebaseapp.com',
+      storageBucket: 'mesamestrre.firebasestorage.app',
+      measurementId: 'G-BPSZX18WV0',
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const STATE = {
+      users: [],
+      dishes: [],
+      orders: [],
+      activity: [],
+      deleteTarget: null,
+      presence: [],
+    };
+
+    const SECTIONS = {
+      dashboard: 'Dashboard',
+      users: 'Usuários',
+      menu: 'Cardápio',
+      reports: 'Relatórios e Rendimentos',
+      settings: 'Configurações',
+    };
+
+    // LISTENERS
+    onSnapshot(collection(db, 'users'), (snapshot) => {
+      STATE.users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderUsers();
+      syncDashboard();
+    });
+
+    onSnapshot(collection(db, 'presence'), (snapshot) => {
+      STATE.presence = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderUsers();
+      syncDashboard();
+    });
+
+    onSnapshot(collection(db, 'products'), (snapshot) => {
+      STATE.dishes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      STATE.dishes = STATE.dishes.map(d => ({
+        ...d,
+        cat: d.category?.name || 'Sem Categoria',
+        avail: d.avail !== false
+      }));
+      renderMenu();
+    });
+
+    onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), (snapshot) => {
+      STATE.orders = snapshot.docs.map(doc => {
+        const data = doc.data();
+        let timeLabel = '';
+        if (data.createdAt) {
+          const date = data.createdAt.toDate();
+          timeLabel = date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+        }
+        return {
+          id: doc.id,
+          num: data.displayId || `#${doc.id.slice(0, 4)}`,
+          table: data.table?.number ? `Mesa ${data.table.number}` : 'Balcão',
+          item: data.items && data.items.length > 0 ? `${data.items[0].product.name} ${data.items.length > 1 ? 'e mais...' : ''}` : 'Vazio',
+          status: mapStatus(data.status),
+          rawStatus: data.status || 'PENDING',
+          time: timeLabel,
+          items: data.items || [],
+          createdAt: data.createdAt
+        };
+      });
+      renderDashboard();
+
+      const reportsSec = document.getElementById('sec-reports');
+      if (reportsSec && reportsSec.classList.contains('active')) {
+        renderReports();
+      }
+    });
+
+    onSnapshot(query(collection(db, 'activities'), orderBy('timestamp', 'desc')), (snapshot) => {
+      STATE.activity = snapshot.docs.map(doc => {
+        const data = doc.data();
+        let timeStr = 'Agora';
+        if (data.timestamp) {
+          const diff = Math.floor((new Date() - data.timestamp.toDate()) / 60000);
+          if (diff < 60) timeStr = diff + ' min atrás';
+          else if (diff < 1440) timeStr = Math.floor(diff / 60) + 'h atrás';
+          else timeStr = 'Há dias';
+        }
+        return { msg: data.msg, time: timeStr };
+      });
+      renderDashboard();
+    });
+
+    function mapStatus(status) {
+      if (status === 'PENDING') return 'Aguardando';
+      if (status === 'PREPARING') return 'Em preparo';
+      if (status === 'READY') return 'Pronto';
+      if (status === 'DELIVERED') return 'Entregue';
+      if (status === 'CANCELED') return 'Cancelado';
+      return status || 'Aguardando';
+    }
+
+    function navigate(key, el) {
+      Object.keys(SECTIONS).forEach(k => {
+        const s = document.getElementById('sec-' + k);
+        if (s) s.classList.toggle('active', k === key);
+      });
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (el) el.classList.add('active');
+      document.getElementById('topbar-title').textContent = SECTIONS[key] || key;
+      if (key === 'dashboard') renderDashboard();
+      if (key === 'users') renderUsers();
+      if (key === 'menu') renderMenu();
+      if (key === 'reports') renderReports();
+      if (key === 'settings') loadSettings();
+    }
+
+    function initials(name) {
+      return name.split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+    }
+
+    function formatPrice(n) {
+      return 'R$ ' + Number(n).toFixed(2).replace('.', ',');
+    }
+
+    function today() {
+      return new Date().toLocaleDateString('pt-BR');
+    }
+
+    async function logActivity(msg) {
+      try {
+        await addDoc(collection(db, 'activities'), {
+          msg: msg,
+          timestamp: serverTimestamp()
+        });
+      } catch (e) { }
+    }
+
+    let toastTimer;
+    function showToast(msg, duration = 3200) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+    }
+
+    function openModal(id) { document.getElementById('modal-' + id).classList.add('open'); }
+    function closeModal(id) { document.getElementById('modal-' + id).classList.remove('open'); }
+    function overlayClose(e, id) {
+      if (e.target === document.getElementById('modal-' + id)) closeModal(id);
+    }
+
+    function syncDashboard() {
+      document.getElementById('stat-orders').textContent = STATE.orders.length;
+      document.getElementById('stat-active').textContent = STATE.orders.filter(o => o.status === 'Em preparo' || o.status === 'Aguardando').length;
+      document.getElementById('stat-staff').textContent = STATE.presence.filter(p => p.isOnline).length;
+    }
+
+    function renderDashboard() {
+      syncDashboard();
+      const statusDot = { 'Entregue': 'dot-green', 'Em preparo': 'dot-amber', 'Aguardando': 'dot-blue' };
+      document.getElementById('dash-orders').innerHTML = STATE.orders.slice(0, 10).map(o => `
+    <div class="order-row">
+      <div class="order-num">${o.num}</div>
+      <div class="order-info">
+        <div>${o.table} — ${o.item}</div>
+        <small>${o.time}</small>
+      </div>
+      <div class="status-indicator">
+        <span class="dot ${statusDot[o.status] || 'dot-blue'}"></span>
+        <span style="color:var(--text2);font-size:12px">${o.status}</span>
+      </div>
+    </div>`).join('');
+
+      document.getElementById('dash-activity').innerHTML = STATE.activity.slice(0, 8).map(a => `
+    <div class="activity-item">
+      <div class="act-dot-col"><div class="act-dot"></div></div>
+      <div class="act-info">
+        <div class="act-msg">${a.msg}</div>
+        <div class="act-time">${a.time}</div>
+      </div>
+    </div>`).join('');
+    }
+
+    function renderReports() {
+      let totalRevenue = 0;
+      let deliveredOrdersCount = 0;
+
+      const categoryRevenue = {};
+      const productSales = {};
+
+      STATE.orders.forEach(o => {
+        if (o.rawStatus !== 'CANCELED') {
+          deliveredOrdersCount++;
+          o.items.forEach(item => {
+            const qty = item.quantity || 1;
+            const price = parseFloat(item.product?.price || 0);
+            const subtotal = qty * price;
+            totalRevenue += subtotal;
+
+            const catName = item.product?.category?.name || 'Sem Categoria';
+            categoryRevenue[catName] = (categoryRevenue[catName] || 0) + subtotal;
+
+            const prodId = item.product?.id || item.product?.name;
+            if (prodId) {
+              if (!productSales[prodId]) {
+                productSales[prodId] = {
+                  name: item.product.name,
+                  category: catName,
+                  quantity: 0,
+                  revenue: 0
+                };
+              }
+              productSales[prodId].quantity += qty;
+              productSales[prodId].revenue += subtotal;
+            }
+          });
+        }
+      });
+
+      const averageTicket = deliveredOrdersCount > 0 ? (totalRevenue / deliveredOrdersCount) : 0;
+
+      document.getElementById('rep-stat-revenue').textContent = formatPrice(totalRevenue);
+      document.getElementById('rep-stat-orders').textContent = deliveredOrdersCount;
+      document.getElementById('rep-stat-ticket').textContent = formatPrice(averageTicket);
+
+      const sortedProducts = Object.values(productSales).sort((a, b) => b.quantity - a.quantity);
+      const mostOrderedContainer = document.getElementById('rep-most-ordered');
+
+      if (sortedProducts.length === 0) {
+        mostOrderedContainer.innerHTML = '<div class="empty-state"><strong>Nenhum dado de vendas</strong>Os dados aparecerão quando os pedidos forem entregues.</div>';
+      } else {
+        mostOrderedContainer.innerHTML = sortedProducts.map((p, idx) => `
+      <div class="order-row">
+        <div class="order-num" style="min-width: 30px; font-weight: 700; color: var(--accent);">#${idx + 1}</div>
+        <div class="order-info">
+          <div style="font-weight: 600;">${p.name}</div>
+          <small>${p.category}</small>
+        </div>
+        <div style="text-align: right; flex-shrink: 0;">
+          <div style="font-weight: 600; font-family: 'DM Mono', monospace;">${p.quantity}x</div>
+          <small style="color: var(--text3); font-size: 11px;">${formatPrice(p.revenue)}</small>
+        </div>
+      </div>
+    `).join('');
+      }
+
+      const chartCanvas = document.getElementById('chart-categories');
+      if (!chartCanvas) return;
+
+      const categories = Object.keys(categoryRevenue);
+      const revenues = Object.values(categoryRevenue);
+
+      if (categories.length === 0) {
+        categories.push("Sem Vendas");
+        revenues.push(0);
+      }
+
+      const colorPalette = [
+        '#1A7A4A',
+        '#1A5DB0',
+        '#5B3DBE',
+        '#E09800',
+        '#C02020',
+        '#9C27B0',
+        '#00BCD4',
+      ];
+
+      if (window.categoryChart) {
+        window.categoryChart.destroy();
+      }
+
+      try {
+        window.categoryChart = new Chart(chartCanvas, {
+          type: 'pie',
+          data: {
+            labels: categories,
+            datasets: [{
+              data: revenues,
+              backgroundColor: colorPalette.slice(0, categories.length),
+              borderWidth: 1.5,
+              borderColor: '#FFFFFF'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: {
+                  font: {
+                    family: "'DM Sans', sans-serif",
+                    size: 11
+                  },
+                  color: '#52525E',
+                  boxWidth: 12
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const value = context.raw;
+                    return ` ${context.label}: ${formatPrice(value)}`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      } catch (e) {
+        console.error("Error creating chart: ", e);
+      }
+    }
+
+    const ROLE_CLASS = {
+      'ADMIN': 'role-admin',
+      'KITCHEN': 'role-cook',
+      'COUNTER': 'role-balc',
+      'WAITER': 'role-waiter',
+    };
+
+    const ROLE_LABEL = {
+      'ADMIN': 'Administrador',
+      'KITCHEN': 'Cozinheiro',
+      'COUNTER': 'Balconista',
+      'WAITER': 'Garçom',
+    };
+
+    function renderUsers() {
+      const tbody = document.getElementById('users-tbody');
+      if (!STATE.users.length) {
+        tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><strong>Nenhum usuário cadastrado</strong>Crie o primeiro funcionário acima.</div></td></tr>';
+        return;
+      }
+      tbody.innerHTML = STATE.users.map(u => {
+        const isOnline = STATE.presence.some(p => p.email === u.email && p.isOnline);
+        return `
+    <tr>
+      <td>
+        <div class="user-cell">
+          <div class="table-avatar">${initials(u.name || '?')}</div>
+          <div>
+            <div class="cell-name">${u.name}</div>
+            <div class="cell-sub">${u.email}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="role-chip ${ROLE_CLASS[u.role] || 'role-balc'}">${ROLE_LABEL[u.role] || u.role}</span></td>
+      <td>
+        <span class="status-chip ${isOnline ? 'status-active' : 'status-inactive'}">
+          <span class="dot ${isOnline ? 'dot-green' : ''}"></span>
+          ${isOnline ? 'Online' : 'Offline'}
+        </span>
+      </td>
+      <td style="color:var(--text3);font-size:12px">${u.created || '-'}</td>
+      <td>
+        <div class="action-group">
+          <button class="btn btn-ghost btn-sm" onclick="openEditUser('${u.id}')">Editar</button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleUserStatus('${u.id}')">${u.active !== false ? 'Desativar' : 'Ativar'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="openResetPassword('${u.id}')">Senha</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmDeleteUser('${u.id}')">Excluir</button>
+        </div>
+      </td>
+    </tr>`;
+      }).join('');
+    }
+
+    function openModal_user_create() {
+      document.getElementById('u-id').value = '';
+      document.getElementById('u-name').value = '';
+      document.getElementById('u-email').value = '';
+      document.getElementById('u-pass').value = '';
+      document.getElementById('u-role').value = 'Administrador';
+      document.getElementById('u-pass-field').style.display = 'block';
+      document.getElementById('user-modal-title').textContent = 'Novo Funcionário';
+      document.getElementById('user-modal-sub').textContent = 'Preencha os dados para criar a conta';
+      document.getElementById('u-submit-btn').textContent = 'Criar Conta';
+      openModal('user');
+    }
+
+    function openEditUser(id) {
+      const u = STATE.users.find(x => x.id === id);
+      if (!u) return;
+      document.getElementById('u-id').value = u.id;
+      document.getElementById('u-name').value = u.name || '';
+      document.getElementById('u-email').value = u.email || '';
+      document.getElementById('u-pass').value = '';
+
+      const reverseRoleMap = {
+        'ADMIN': 'Administrador',
+        'KITCHEN': 'Cozinheiro',
+        'COUNTER': 'Balconista',
+        'WAITER': 'Garcom'
+      };
+      document.getElementById('u-role').value = reverseRoleMap[u.role] || 'Garcom';
+
+      document.getElementById('u-pass-field').style.display = 'none';
+      document.getElementById('user-modal-title').textContent = 'Editar Funcionário';
+      document.getElementById('user-modal-sub').textContent = 'Altere os dados do funcionário';
+      document.getElementById('u-submit-btn').textContent = 'Salvar Alterações';
+      openModal('user');
+    }
+
+    let secondaryApp = null;
+    async function submitUser() {
+      const id = document.getElementById('u-id').value;
+      const name = document.getElementById('u-name').value.trim();
+      const email = document.getElementById('u-email').value.trim();
+
+      const roleMap = {
+        'Administrador': 'ADMIN',
+        'Cozinheiro': 'KITCHEN',
+        'Balconista': 'COUNTER',
+        'Garcom': 'WAITER'
+      };
+      const roleCode = roleMap[document.getElementById('u-role').value] || 'WAITER';
+
+      if (!name) { showToast('Informe o nome completo.'); return; }
+
+      if (id) {
+        const dup = STATE.users.some(u => u.id !== id && u.email.toLowerCase() === email.toLowerCase());
+        if (dup) { showToast('Este e-mail já está cadastrado.'); return; }
+        await updateDoc(doc(db, 'users', id), { name, email, role: roleCode });
+        logActivity(`Dados de <b>${name}</b> atualizados`);
+        closeModal('user');
+        showToast('Funcionário atualizado com sucesso.');
+      } else {
+        const dup = STATE.users.some(u => u.email.toLowerCase() === email.toLowerCase());
+        if (dup) { showToast('Este e-mail já está cadastrado.'); return; }
+
+        const pass = document.getElementById('u-pass').value;
+        if (pass.length < 6) { showToast('A senha deve ter no mínimo 6 caracteres.'); return; }
+
+        try {
+          document.getElementById('u-submit-btn').textContent = 'Criando...';
+          if (!secondaryApp) {
+            secondaryApp = initializeApp(firebaseConfig, "Secondary");
+          }
+          const secondaryAuth = getAuth(secondaryApp);
+          const cred = await createUserWithEmailAndPassword(secondaryAuth, email, pass);
+          const newUid = cred.user.uid;
+          await secondaryAuth.signOut();
+
+          await setDoc(doc(db, 'users', newUid), { name, email, role: roleCode, active: true, created: today() });
+          logActivity(`Conta de <b>${name}</b> criada no App e Firebase`);
+          closeModal('user');
+          showToast('Funcionário criado com sucesso.');
+        } catch (e) {
+          showToast('Erro ao criar conta: ' + e.message);
+        } finally {
+          document.getElementById('u-submit-btn').textContent = 'Criar Conta';
+        }
+      }
+    }
+
+    async function toggleUserStatus(id) {
+      const u = STATE.users.find(x => x.id === id);
+      if (!u) return;
+      const currentActive = u.active !== false;
+      await updateDoc(doc(db, 'users', id), { active: !currentActive });
+      logActivity(`Conta de <b>${u.name}</b> ${!currentActive ? 'ativada' : 'desativada'}`);
+      showToast(`Conta ${!currentActive ? 'ativada' : 'desativada'}.`);
+    }
+
+    function openResetPassword(id) {
+      const u = STATE.users.find(x => x.id === id);
+      if (!u) return;
+      document.getElementById('reset-uid').value = id;
+      document.getElementById('reset-sub').textContent = `Nova senha para ${u.name}`;
+      document.getElementById('reset-pass').value = '';
+      document.getElementById('reset-pass2').value = '';
+      openModal('reset');
+    }
+
+    function executeReset() {
+      const id = document.getElementById('reset-uid').value;
+      const pass = document.getElementById('reset-pass').value;
+      const pass2 = document.getElementById('reset-pass2').value;
+      if (pass.length < 6) { showToast('A senha deve ter pelo menos 6 caracteres.'); return; }
+      if (pass !== pass2) { showToast('As senhas não coincidem.'); return; }
+      const u = STATE.users.find(x => x.id === id);
+      if (u) logActivity(`Senha de <b>${u.name}</b> redefinida (Ação do App requerida)`);
+      closeModal('reset');
+      showToast('Solicitação de senha registrada.');
+    }
+
+    function confirmDeleteUser(id) {
+      const u = STATE.users.find(x => x.id === id);
+      if (!u) return;
+      STATE.deleteTarget = { type: 'user', id };
+      document.getElementById('confirm-text').innerHTML =
+        `Tem certeza que deseja excluir <b>${u.name}</b>? Esta ação não pode ser desfeita.`;
+      openModal('confirm');
+    }
+
+    function normalizeDishName(name) {
+      return String(name || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, ' ');
+    }
+
+    function dishKey(dish) {
+      const name = normalizeDishName(dish.name);
+      const price = Number(dish.price || 0).toFixed(2);
+      const category = normalizeDishName(dish.cat || dish.category?.name || 'Sem Categoria');
+      return `${name}|${price}|${category}`;
+    }
+
+    function uniqueDishes(dishes) {
+      const seen = new Set();
+      return dishes.filter(dish => {
+        const key = dishKey(dish);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function hasDishDuplicate({ id = '', name, price, cat }) {
+      const candidateKey = dishKey({ name, price, cat });
+      return STATE.dishes.some(dish => dish.id !== id && dishKey(dish) === candidateKey);
+    }
+
+    function renderMenu() {
+      const search = document.getElementById('menu-search').value.trim().toLowerCase();
+      const cat = document.getElementById('menu-cat-filter').value;
+      let list = uniqueDishes(STATE.dishes);
+      if (search) list = list.filter(d => d.name.toLowerCase().includes(search));
+      if (cat && cat !== 'Todas as categorias') list = list.filter(d => d.cat === cat);
+
+      if (!list.length) {
+        document.getElementById('menu-grid').innerHTML =
+          '<div class="empty-state" style="grid-column:1/-1"><strong>Nenhum prato encontrado</strong>Tente ajustar os filtros.</div>';
+        return;
+      }
+
+      document.getElementById('menu-grid').innerHTML = list.map(d => `
+    <div class="dish-card" id="dish-card-${d.id}">
+      <div class="dish-thumb">Sem foto</div>
+      <div class="dish-body">
+        <div class="dish-name">${d.name}</div>
+        <div class="dish-cat">${d.cat}</div>
+        <button class="avail-btn ${d.avail ? 'avail-on' : 'avail-off'}" onclick="toggleDishAvail('${d.id}')">
+          <span class="dot ${d.avail ? 'dot-green' : ''}"></span>
+          ${d.avail ? 'Disponível' : 'Indisponível'}
+        </button>
+      </div>
+      <div class="dish-footer">
+        <div class="dish-price">${formatPrice(d.price)}</div>
+        <div class="dish-actions">
+          <div class="icon-btn" title="Editar prato" onclick="openEditDish('${d.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </div>
+          <div class="icon-btn del" title="Excluir prato" onclick="confirmDeleteDish('${d.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+    }
+
+    function openModal_dish_create() {
+      document.getElementById('d-id').value = '';
+      document.getElementById('d-name').value = '';
+      document.getElementById('d-price').value = '';
+      document.getElementById('d-cat').value = 'Entradas';
+      document.getElementById('dish-modal-title').textContent = 'Adicionar Prato';
+      document.getElementById('d-submit-btn').textContent = 'Adicionar Prato';
+      openModal('dish');
+    }
+
+    function openEditDish(id) {
+      const d = STATE.dishes.find(x => x.id === id);
+      if (!d) return;
+      document.getElementById('d-id').value = d.id;
+      document.getElementById('d-name').value = d.name;
+      document.getElementById('d-price').value = d.price;
+      document.getElementById('d-cat').value = d.cat;
+      document.getElementById('dish-modal-title').textContent = 'Editar Prato';
+      document.getElementById('d-submit-btn').textContent = 'Salvar Alterações';
+      openModal('dish');
+    }
+
+    async function submitDish() {
+      const id = document.getElementById('d-id').value;
+      const name = document.getElementById('d-name').value.trim();
+      const price = parseFloat(document.getElementById('d-price').value);
+      const cat = document.getElementById('d-cat').value;
+
+      if (!name) { showToast('Informe o nome do prato.'); return; }
+      if (isNaN(price) || price < 0) { showToast('Informe um preço válido.'); return; }
+
+      const categoryMap = {
+        'Lanches': { id: 'lan', name: 'Lanches' },
+        'Porções': { id: 'por', name: 'Porções' },
+        'Entradas': { id: 'ent', name: 'Entradas' },
+        'Principais': { id: 'pri', name: 'Principais' },
+        'Bebidas': { id: 'beb', name: 'Bebidas' },
+        'Sobremesas': { id: 'sob', name: 'Sobremesas' }
+      };
+      const category = categoryMap[cat] || categoryMap['Entradas'];
+
+      if (hasDishDuplicate({ id, name, price, cat })) {
+        showToast('Este prato ja existe no cardapio.');
+        return;
+      }
+
+      if (id) {
+        const d = STATE.dishes.find(x => x.id === id);
+        if (d) {
+          await updateDoc(doc(db, 'products', id), { name, price, category });
+          logActivity(`Prato <b>${name}</b> atualizado`);
+          closeModal('dish');
+          showToast('Prato atualizado com sucesso.');
+        }
+      } else {
+        await addDoc(collection(db, 'products'), { name, price, category, avail: true });
+        logActivity(`Prato <b>${name}</b> adicionado ao cardápio`);
+        closeModal('dish');
+        showToast('Prato adicionado ao cardápio.');
+      }
+    }
+
+    async function toggleDishAvail(id) {
+      const d = STATE.dishes.find(x => x.id === id);
+      if (!d) return;
+      await updateDoc(doc(db, 'products', id), { avail: !d.avail });
+      logActivity(`Prato <b>${d.name}</b> marcado como ${!d.avail ? 'disponível' : 'indisponível'}`);
+      showToast(`Prato marcado como ${!d.avail ? 'disponível' : 'indisponível'}.`);
+    }
+
+    async function removeDuplicateDishes() {
+      const seen = new Set();
+      const duplicates = [];
+
+      STATE.dishes.forEach(dish => {
+        const key = dishKey(dish);
+        if (seen.has(key)) {
+          duplicates.push(dish);
+        } else {
+          seen.add(key);
+        }
+      });
+
+      if (!duplicates.length) {
+        showToast('Nenhum prato duplicado encontrado.');
+        return;
+      }
+
+      for (const dish of duplicates) {
+        await deleteDoc(doc(db, 'products', dish.id));
+      }
+
+      logActivity(`${duplicates.length} prato${duplicates.length > 1 ? 's' : ''} duplicado${duplicates.length > 1 ? 's' : ''} removido${duplicates.length > 1 ? 's' : ''} do cardapio`);
+      showToast('Pratos duplicados removidos.');
+    }
+
+    function confirmDeleteDish(id) {
+      const d = STATE.dishes.find(x => x.id === id);
+      if (!d) return;
+      STATE.deleteTarget = { type: 'dish', id };
+      document.getElementById('confirm-text').innerHTML =
+        `Tem certeza que deseja excluir <b>${d.name}</b>? Esta ação não pode ser desfeita.`;
+      openModal('confirm');
+    }
+
+    async function executeDelete() {
+      const target = STATE.deleteTarget;
+      if (!target) return;
+
+      if (target.type === 'user') {
+        const u = STATE.users.find(x => x.id === target.id);
+        if (u) {
+          await deleteDoc(doc(db, 'users', target.id));
+          logActivity(`Conta de <b>${u.name}</b> excluída`);
+        }
+        closeModal('confirm');
+        showToast('Usuário excluído.');
+      } else if (target.type === 'dish') {
+        const d = STATE.dishes.find(x => x.id === target.id);
+        if (d) {
+          await deleteDoc(doc(db, 'products', target.id));
+          logActivity(`Prato <b>${d.name}</b> removido do cardápio`);
+        }
+        closeModal('confirm');
+        showToast('Prato excluído.');
+      }
+
+      STATE.deleteTarget = null;
+    }
+
+    function loadSettings() {
+      document.getElementById('cfg-name').value = STATE.users[0]?.name || '';
+      document.getElementById('cfg-email').value = STATE.users[0]?.email || '';
+      document.getElementById('cfg-pass').value = '';
+      document.getElementById('cfg-pass2').value = '';
+    }
+
+    function saveSettings() {
+      const name = document.getElementById('cfg-name').value.trim();
+      showToast('Configurações salvas (mock).');
+    }
+
+    document.querySelectorAll('.btn-primary').forEach(btn => {
+      if (btn.getAttribute('onclick') === "openModal('user')") {
+        btn.setAttribute('onclick', 'openModal_user_create()');
+      }
+      if (btn.getAttribute('onclick') === "openModal('dish')") {
+        btn.setAttribute('onclick', 'openModal_dish_create()');
+      }
+    });
+
+    window.navigate = navigate;
+    window.renderReports = renderReports;
+    window.renderMenu = renderMenu;
+    window.closeModal = closeModal;
+    window.overlayClose = overlayClose;
+    window.submitUser = submitUser;
+    window.toggleUserStatus = toggleUserStatus;
+    window.openEditUser = openEditUser;
+    window.openResetPassword = openResetPassword;
+    window.executeReset = executeReset;
+    window.confirmDeleteUser = confirmDeleteUser;
+    window.openModal_user_create = openModal_user_create;
+    window.submitDish = submitDish;
+    window.toggleDishAvail = toggleDishAvail;
+    window.openEditDish = openEditDish;
+    window.confirmDeleteDish = confirmDeleteDish;
+    window.openModal_dish_create = openModal_dish_create;
+    window.executeDelete = executeDelete;
+    window.saveSettings = saveSettings;
+
+    renderDashboard();
+  </script>
+</body>
+
+</html>

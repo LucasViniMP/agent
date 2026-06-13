@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "515755675116",
+    "project_id": "mesamestrre",
+    "storage_bucket": "mesamestrre.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:515755675116:android:26afd789aa04a1f43ec4c9",
+        "android_client_info": {
+          "package_name": "com.example.mesamestre"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCH6vj59anyT36EsENbJzwD-K6z7hjYSL0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
